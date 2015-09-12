@@ -92,21 +92,21 @@ The values for all CGI keys (named without a period) MUST be a scalar string.
 
 See below for details.
 
-`REQUEST_METHOD`: The HTTP request method, such as "GET" or "POST". This MUST
+* `REQUEST_METHOD`: The HTTP request method, such as "GET" or "POST". This MUST
 NOT be an empty string, and so is always required.  `SCRIPT_NAME`: The initial
 portion of the request URL's path, corresponding to the application. This tells
 the application its virtual "location". This may be an empty string if the
 application corresponds to the server's root URI.  If this key is not empty, it
 MUST start with a forward slash (`/`).
 
-`PATH_INFO`: The remainder of the request URL's path, designating the virtual
+* `PATH_INFO`: The remainder of the request URL's path, designating the virtual
 "location" of the request's target within the application. This may be an empty
 string if the request URL targets the application root and does not have a
 trailing slash. This value should be URI decoded by servers in order to be
 compatible with RFC 3875.  If this key is not empty, it MUST start with a
 forward slash (`/`).
 
-`REQUEST_URI`: The undecoded, raw request URL line. It is the raw URI path and
+* `REQUEST_URI`: The undecoded, raw request URL line. It is the raw URI path and
 query part that appears in the HTTP GET /... HTTP/1.x line and doesn't contain
 URI scheme and host names.  Unlike `PATH_INFO`, this value SHOULD NOT be
 decoded by servers. It is an application's responsibility to properly decode
