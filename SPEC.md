@@ -118,44 +118,15 @@ key instead of `PATH_INFO`.
 
 ## Questions and Answers
 
-1. Why must environment be an associative array? What's wrong with using a
-   class?
-
-The rationale for requiring an associative array is to maximize portability
-between servers. In practice, however, most servers will probably find a
-Request class adequate to their needs, and thus framework authors will come to
-expect the full set of features to be available, since they will be there more
-often than not.
-
-But, if some server chooses not to use an associative array, then there will be
-interoperability problems despite that server's "conformance" to spec.
-Therefore, making a an associative array mandatory simplifies the specification
-and guarantees interoperabilty.
-
-2. Why is this interface so low-level? I want feature X! (e.g. cookies,
-   sessions, persistence, ...)
-
-This isn't Yet Another PHP Web Framework. It's just a way for frameworks to
-talk to web servers, and vice versa. If you want these features, you need to
-pick a web framework that provides the features you want. And if that framework
-lets you create a PHPSGI application, you should be able to run it in most
-PHPSGI-supporting servers. Also, some PHPSGI servers may offer additional
-services via objects provided in their environ dictionary; see the applicable
-server documentation for details. (Of course, applications that use such
-extensions will not be portable to other PHPSGI-based servers.)
-
-3. Why use CGI variables instead of good old HTTP headers? And why mix them in
-   with PHPSGI-defined variables?
-
-Many existing web frameworks are built heavily upon the CGI spec, especially
-the global `$_SERVER` variable, and existing SAPI web servers know how to
-generate CGI variables. In contrast, alternative ways of representing inbound
-HTTP information are fragmented and lack market share.
-
-Thus, using the CGI "standard" seems like a good way to leverage existing
-implementations. As for mixing them with PHPSGI variables, separating them
-would just require two assoc array  arguments to be passed around, while
-providing no real benefits.
+1. Why must environment be an associative array? What's wrong with using a class?
+	The rationale for requiring an associative array is to maximize portability between servers. In practice, however, most servers will probably find a Request class adequate to their needs, and thus framework authors will come to expect the full set of features to be available, since they will be there more often than not.
+	But, if some server chooses not to use an associative array, then there will be interoperability problems despite that server's "conformance" to spec.
+Therefore, making a an associative array mandatory simplifies the specification and guarantees interoperabilty.
+2. Why is this interface so low-level? I want feature X! (e.g. cookies, sessions, persistence, ...)
+	This isn't Yet Another PHP Web Framework. It's just a way for frameworks to talk to web servers, and vice versa. If you want these features, you need to pick a web framework that provides the features you want. And if that framework lets you create a PHPSGI application, you should be able to run it in most PHPSGI-supporting servers. Also, some PHPSGI servers may offer additional services via objects provided in their environ dictionary; see the applicable server documentation for details. (Of course, applications that use such extensions will not be portable to other PHPSGI-based servers.)
+3. Why use CGI variables instead of good old HTTP headers? And why mix them in with PHPSGI-defined variables?
+	Many existing web frameworks are built heavily upon the CGI spec, especially the global `$_SERVER` variable, and existing SAPI web servers know how to generate CGI variables. In contrast, alternative ways of representing inbound HTTP information are fragmented and lack market share.
+	Thus, using the CGI "standard" seems like a good way to leverage existing implementations. As for mixing them with PHPSGI variables, separating them would just require two assoc array  arguments to be passed around, while providing no real benefits.
 
 ## Changelogs
 
