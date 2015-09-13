@@ -4,76 +4,51 @@ PHP Server Gateway Interface specification
 
 ## Abstract
 
-This document specifies a standard interface between web servers and PHP web
-applications or frameworks. This interface is designed to promote web
-application portability and reduce the duplication of effort by web application
-framework developers.
+This document specifies a standard interface between web servers and PHP web applications or frameworks. This interface is designed to promote web application portability and reduce the duplication of effort by web application framework developers.
 
-Please keep in mind that PHPSGI is not Yet Another web application framework.
-PHPSGI is a specification to decouple web server environments from web
-application framework code. Nor is PHPSGI a web application API. Web
-application developers (end users) will not run their web applications directly
-using the PHPSGI interface, but instead are encouraged to use frameworks that
-support PHPSGI.
-
+Please keep in mind that PHPSGI is not Yet Another web application framework.  PHPSGI is a specification to decouple web server environments from web application framework code. Nor is PHPSGI a web application API. Web application developers (end users) will not run their web applications directly using the PHPSGI interface, but instead are encouraged to use frameworks that support PHPSGI.
 
 ## Terminology
 
 ### Web Servers
 
-Web servers accept HTTP requests issued by web clients, dispatching those
-requests to web applications if configured to do so, and return HTTP responses
-to the request-initiating clients. Web servers can be any PHP SAPI web server
-(e.g. php-fpm, Apache PHP module ...) or any HTTP server implemented in PHP
-like "ReactPHP".
+Web servers accept HTTP requests issued by web clients, dispatching those requests to web applications if configured to do so, and return HTTP responses to the request-initiating clients. Web servers can be any PHP SAPI web server (e.g. php-fpm, Apache PHP module ...) or any HTTP server implemented in PHP like "ReactPHP".
 
 ### PHPSGI Server
-A PHPSGI Server is a PHP program providing an environment for a PHPSGI
-application to run in.
 
-PHPSGI specifying an interface for web applications and the main purpose of web
-applications being to be served to the Internet, a PHPSGI Server will most
-likely be either: part of a web server (like Apache module PHP), connected to a
-web server (with FastCGI), invoked by a web server (as in plain old CGI), or be
-a standalone web server itself, written entirely or partly in PHP.
+A PHPSGI Server is a PHP program providing an environment for a PHPSGI application to run in.
 
-There is, however, no requirement for a PHPSGI Server to actually be a web
-server or part of one, as PHPSGI only defines an interface between the server
-and the application, not between the server and the world.
+PHPSGI specifying an interface for web applications and the main purpose of web applications being to be served to the Internet, a PHPSGI Server will most likely be either: part of a web server (like Apache module PHP), connected to a web server (with FastCGI), invoked by a web server (as in plain old CGI), or be a standalone web server itself, written entirely or partly in PHP.
 
-A PHPSGI Server is often also called PHPSGI Application Container because it is
-similar to a Java Servlet container, which is Java process providing an
-environment for Java Servlets.
+There is, however, no requirement for a PHPSGI Server to actually be a web server or part of one, as PHPSGI only defines an interface between the server and the application, not between the server and the world.
+
+A PHPSGI Server is often also called PHPSGI Application Container because it is similar to a Java Servlet container, which is Java process providing an environment for Java Servlets.
 
 ### Applications
+
 Web applications accept HTTP requests and return HTTP responses.
 
-PHPSGI applications are web applications conforming to the PHPSGI interface,
-prescribing they take the form of a code reference with defined input and
-output.
+PHPSGI applications are web applications conforming to the PHPSGI interface, prescribing they take the form of a code reference with defined input and output.
 
-For simplicity, PHPSGI Applications will also be referred to as Applications
-for the remainder of this document.
+For simplicity, PHPSGI Applications will also be referred to as Applications for the remainder of this document.
 
-### Middleware Middleware is a PHPSGI application (a code reference) and a
-Server. Middleware looks like an application when called from a server, and it
-in turn can call other applications. It can be thought of a plugin to extend a
-PHPSGI application.
+### Middleware 
 
-### Framework developers Framework developers are the authors of web
-application frameworks. They write adapters (or engines) which accept PHPSGI
-input, run a web application, and return a PHPSGI response to the server.
+Middleware is a PHPSGI application (a code reference) and a Server. Middleware looks like an application when called from a server, and it in turn can call other applications. It can be thought of a plugin to extend a PHPSGI application.
 
-### Web application developers Web application developers are developers who
-write code on top of a web application framework. These developers should never
-have to deal with PHPSGI directly.
+### Framework developers 
+
+Framework developers are the authors of web application frameworks. They write adapters (or engines) which accept PHPSGI input, run a web application, and return a PHPSGI response to the server.
+
+### Web application developers 
+
+Web application developers are developers who write code on top of a web application framework. These developers should never have to deal with PHPSGI directly.
 
 ## Specification
 
 ### Application
 
-A PHPSGI application is any callable variable, e.g. a Closure, an array
-contains callable payload or an object defined with `__invoke` magic method.
+A PHPSGI application is any callable variable, e.g. a Closure, an array contains callable payload or an object defined with `__invoke` magic method.
 
 
 ### The Environment
