@@ -1,0 +1,24 @@
+{
+    "name": "phpsgi/phpsgi",
+    "description": "",
+    "homepage": "https://github.com/phpsgi/phpsgi",
+    "keywords": [
+        "http",
+        "middleware",
+        "server",
+        "phpsgi"
+    ],
+    "authors": [
+        {
+            "name": "c9s",
+            "email": "cornelius.howl@gmail.com"
+        }
+    ],
+    "require": { },
+    "license": "MIT",
+    "suggest": { },
+    "require-dev": { },
+    "autoload": {
+        "psr-4": { "PHPSGI\\": "" }
+    }
+}
