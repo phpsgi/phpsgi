@@ -19,6 +19,6 @@
     "suggest": { },
     "require-dev": { },
     "autoload": {
-        "psr-4": { "PHPSGI\\": "" }
+        "psr-4": { "PHPSGI\\": "src/" }
     }
 }
