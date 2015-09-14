@@ -12,5 +12,9 @@
 
 extern zend_module_entry phpsgi_module_entry;
 
+PHP_METHOD(PHPSGIMiddleware, __construct);
+PHP_METHOD(PHPSGIMiddleware, call);
+PHP_METHOD(PHPSGIMiddleware, __invoke);
+
 #endif
 
