@@ -256,6 +256,10 @@ static void phpsgi_register_classes(TSRMLS_D)
     zend_class_entry ce_middleware;
     INIT_CLASS_ENTRY(ce_middleware, "PHPSGI\\Middleware", phpsgi_middleware_funcs);
     phpsgi_ce_middleware = zend_register_internal_class(&ce_middleware TSRMLS_CC);
+
+    // implement one interface
+    zend_class_implements(phpsgi_ce_middleware TSRMLS_CC, 1, phpsgi_ce_app_interface);
+
     zend_declare_property_null(phpsgi_ce_middleware, "next", sizeof("next")-1, ZEND_ACC_PUBLIC TSRMLS_CC);
 }
 
