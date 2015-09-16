@@ -64,10 +64,15 @@ The application can also be defined in PHP class:
 
 ```php
 use PHPSGI\App;
-class MyApp extends App {
+
+class MyApp implements App {
 	public function call(array & $environment, array $response) {
 		// [response code,  response headers, body content ]
 		return [ 200, [ 'Content-Type' => 'plain/text' ], 'Hello World' ];
+	}
+	
+	public function __invoke(array & $environment, array $response) {
+		return $this->call($environment, $response);
 	}
 }
 ```
