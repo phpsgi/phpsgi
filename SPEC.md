@@ -50,6 +50,27 @@ Web application developers are developers who write code on top of a web applica
 
 A PHPSGI application is any callable variable, e.g. a Closure, an array contains callable payload or an object defined with `__invoke` magic method.
 
+To define a PHPSGI application, you just need a closure object with the following prototype):
+
+```php
+$app = function(array & $environment, array $response) {
+	
+	// [response code,  response headers, body content ]
+	return [ 200, [ 'Content-Type' => 'plain/text' ], 'Hello World' ];
+};
+```
+
+The application can also be defined in PHP class:
+
+```php
+use PHPSGI\App;
+class MyApp extends App {
+	public function call(array & $environment, array $response) {
+		// [response code,  response headers, body content ]
+		return [ 200, [ 'Content-Type' => 'plain/text' ], 'Hello World' ];
+	}
+}
+```
 
 ### The Environment
 
@@ -62,6 +83,26 @@ When an environment key is described as a boolean, its value MUST conform to
 PHP's notion of boolean-ness. This means that an empty string or an explicit 0
 are both valid false values. If a boolean key is not present, an application
 MAY treat this as a false value.
+
+The environment array is derived from `$_SERVER` since it's supported by all current SAPI servers.
+
+To create an environment array from PHP's super global arrays:
+
+```php
+$environment = array_merge($_SERVER, [
+	'parameters' => $_REQUEST,
+	'body_parameters' => $_POST,
+	'query_parameters' => $_GET,
+]);
+```
+
+Then the environment array can be passed to the application closure:
+
+```php
+$defaultResponse = [ 200, [], '' ];
+$response = $app($environment, $defaultResponse);
+```
+
 
 The values for all CGI keys (named without a period) MUST be a scalar string.
 
@@ -89,6 +130,26 @@ paths in order to map URLs to application handlers if they choose to use this
 key instead of `PATH_INFO`.
 
 ### Middleware
+
+package phpsgi/phpsgi provides out-of-box middleware base class and app interface (implemented in both extension and pure php), you can define your middlewares like this:
+
+```php
+use PHPSGI\Middleware;
+
+class MyMiddleware extends Middleware
+{
+	public function call(array & $environment, array $response) {
+		// preprocessing ...
+		
+		// call the next middleware or application
+		$response = parent::call($environment, $response);
+		
+		// postprocessing 
+		
+		return $response;
+	}
+}
+```
 
 
 ## Questions and Answers
