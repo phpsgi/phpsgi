@@ -86,7 +86,7 @@ MAY treat this as a false value.
 
 The environment array is derived from `$_SERVER` since it's supported by all current SAPI servers.
 
-To create an environment array from PHP's super global arrays:
+To create an environment array from PHP's super global arrays (for SAPI servers):
 
 ```php
 $environment = array_merge($_SERVER, [
@@ -149,6 +149,14 @@ class MyMiddleware extends Middleware
 		return $response;
 	}
 }
+```
+
+To wrap your application with middlewares:
+
+```php
+$app = new MyMiddleware($app);
+$app = new XHProfMiddleware($app);
+$response = $app($environment, $response);
 ```
 
 
