@@ -8,6 +8,15 @@ This document specifies a standard interface between web servers and PHP web app
 
 Please keep in mind that PHPSGI is not Yet Another web application framework.  PHPSGI is a specification to decouple web server environments from web application framework code. Nor is PHPSGI a web application API. Web application developers (end users) will not run their web applications directly using the PHPSGI interface, but instead are encouraged to use frameworks that support PHPSGI.
 
+
+## Implementation
+
+To develop PHPSGI compatible applications, you can use composer to install `phpsgi/phpsgi` package.
+
+```sh
+composer require phpsgi/phpsgi "dev-master"
+```
+
 ## Terminology
 
 ### Web Servers
