@@ -21,49 +21,72 @@ composer require phpsgi/phpsgi "dev-master"
 
 ### Web Servers
 
-Web servers accept HTTP requests issued by web clients, dispatching those requests to web applications if configured to do so, and return HTTP responses to the request-initiating clients. Web servers can be any PHP SAPI web server (e.g. php-fpm, Apache PHP module ...) or any HTTP server implemented in PHP like "ReactPHP".
+Web servers accept HTTP requests issued by web clients, dispatching those
+requests to web applications if configured to do so, and return HTTP responses
+to the request-initiating clients. Web servers can be any PHP SAPI web server
+(e.g. php-fpm, Apache PHP module ...) or any HTTP server implemented in PHP
+like "ReactPHP".
 
 ### PHPSGI Server
 
-A PHPSGI Server is a PHP program providing an environment for a PHPSGI application to run in.
+A PHPSGI Server is a PHP program providing an environment for a PHPSGI
+application to run in.
 
-PHPSGI specifying an interface for web applications and the main purpose of web applications being to be served to the Internet, a PHPSGI Server will most likely be either: part of a web server (like Apache module PHP), connected to a web server (with FastCGI), invoked by a web server (as in plain old CGI), or be a standalone web server itself, written entirely or partly in PHP.
+PHPSGI specifying an interface for web applications and the main purpose of web
+applications being to be served to the Internet, a PHPSGI Server will most
+likely be either: part of a web server (like Apache module PHP), connected to a
+web server (with FastCGI), invoked by a web server (as in plain old CGI), or be
+a standalone web server itself, written entirely or partly in PHP.
 
-There is, however, no requirement for a PHPSGI Server to actually be a web server or part of one, as PHPSGI only defines an interface between the server and the application, not between the server and the world.
+There is, however, no requirement for a PHPSGI Server to actually be a web
+server or part of one, as PHPSGI only defines an interface between the server
+and the application, not between the server and the world.
 
-A PHPSGI Server is often also called PHPSGI Application Container because it is similar to a Java Servlet container, which is Java process providing an environment for Java Servlets.
+A PHPSGI Server is often also called PHPSGI Application Container because it is
+similar to a Java Servlet container, which is Java process providing an
+environment for Java Servlets.
 
 ### Applications
 
 Web applications accept HTTP requests and return HTTP responses.
 
-PHPSGI applications are web applications conforming to the PHPSGI interface, prescribing they take the form of a code reference with defined input and output.
+PHPSGI applications are web applications conforming to the PHPSGI interface,
+prescribing they take the form of a code reference with defined input and
+output.
 
-For simplicity, PHPSGI Applications will also be referred to as Applications for the remainder of this document.
+For simplicity, PHPSGI Applications will also be referred to as Applications
+for the remainder of this document.
 
 ### Middleware 
 
-Middleware is a PHPSGI application (a code reference) and a Server. Middleware looks like an application when called from a server, and it in turn can call other applications. It can be thought of a plugin to extend a PHPSGI application.
+Middleware is a PHPSGI application (a code reference) and a Server. Middleware
+looks like an application when called from a server, and it in turn can call
+other applications. It can be thought of a plugin to extend a PHPSGI
+application.
 
 ### Framework developers 
 
-Framework developers are the authors of web application frameworks. They write adapters (or engines) which accept PHPSGI input, run a web application, and return a PHPSGI response to the server.
+Framework developers are the authors of web application frameworks. They write
+adapters (or engines) which accept PHPSGI input, run a web application, and
+return a PHPSGI response to the server.
 
 ### Web application developers 
 
-Web application developers are developers who write code on top of a web application framework. These developers should never have to deal with PHPSGI directly.
+Web application developers are developers who write code on top of a web
+application framework. These developers should never have to deal with PHPSGI
+directly.
 
 ## Specification
 
 ### Application
 
-A PHPSGI application is any callable variable, e.g. a Closure, an array contains callable payload or an object defined with `__invoke` magic method.
+A PHPSGI application is any callable variable, e.g. a Closure, an array
+contains callable payload or an object defined with `__invoke` magic method.
 
-To define a PHPSGI application, you just need a closure object with the following prototype):
+A PHPSGI application can be defined as follow:
 
 ```php
 $app = function(array & $environment, array $response) {
-	
 	// [response code,  response headers, body content ]
 	return [ 200, [ 'Content-Type' => 'plain/text' ], 'Hello World' ];
 };
@@ -107,6 +130,7 @@ $environment = array_merge($_SERVER, [
 	'parameters' => $_REQUEST,
 	'body_parameters' => $_POST,
 	'query_parameters' => $_GET,
+    'phpsgi.input' => fopen('php://input'),
 ]);
 ```
 
@@ -143,6 +167,58 @@ decoded by servers. It is an application's responsibility to properly decode
 paths in order to map URLs to application handlers if they choose to use this
 key instead of `PATH_INFO`.
 
+* `QUERY_STRING`: The portion of the request URL that follows the ?, if any.
+  This key MAY be empty, but MUST always be present, even if empty.
+
+* `SERVER_NAME`, `SERVER_PORT`: When combined with SCRIPT_NAME and PATH_INFO,
+  these keys can be used to complete the URL. Note, however, that HTTP_HOST, if
+  present, should be used in preference to SERVER_NAME for reconstructing the
+  request URL. SERVER_NAME and SERVER_PORT MUST NOT be empty strings, and are
+  always required.
+
+* `SERVER_PROTOCOL`: The version of the protocol the client used to send the
+  request. Typically this will be something like "HTTP/1.0" or "HTTP/1.1" and
+  may be used by the application to determine how to treat any HTTP request
+  headers.
+
+* `CONTENT_LENGTH`: The length of the content in bytes, as an integer. The
+  presence or absence of this key should correspond to the presence or absence
+  of HTTP Content-Length header in the request.
+
+* `CONTENT_TYPE`: The request's MIME type, as specified by the client. The
+  presence or absence of this key should correspond to the presence or absence
+  of HTTP Content-Type header in the request.
+
+A server should attempt to provide as many other CGI variables as are
+applicable. Note, however, that an application that uses any CGI variables
+other than the ones listed above are necessarily non-portable to web servers
+that do not support the relevant extensions.
+
+* `phpsgi.version`: An array reference [1,1] representing this version of PHPSGI.
+  The first number is the major version and the second it the minor version.
+
+* `phpsgi.input`: the input stream. See below for details.
+
+* `phpsgi.nonblocking`: A boolean which is true if the server is calling the
+  application in an non-blocking event loop.
+
+* `phpsgi.streaming`: A boolean which is true if the server supports callback style delayed response and streaming writer object.
+
+
+### The Input Stream
+
+The input stream in phpsgi.input is an resource which streams the
+raw HTTP POST or PUT data. If it is a file handle then it MUST be opened in
+binary mode. The input stream MUST respond to read and MAY implement seek.
+
+
+PHP's built-in file handle or `StreamWrapper` based objects
+<http://php.net/manual/en/wrappers.php.php> should work as-is in a PHPSGI
+server. Application developers SHOULD NOT inspect the type or class of the
+stream. Instead, they SHOULD simply call fread on the object.
+
+
+
 ### Middleware
 
 package phpsgi/phpsgi provides out-of-box middleware base class and app interface (implemented in both extension and pure php), you can define your middlewares like this:
@@ -178,17 +254,38 @@ $response = $app($environment, $response);
 
 1. Why must environment be an associative array? What's wrong with using a class?
 
-	The rationale for requiring an associative array is to maximize portability between servers. In practice, however, most servers will probably find a Request class adequate to their needs, and thus framework authors will come to expect the full set of features to be available, since they will be there more often than not.
-	But, if some server chooses not to use an associative array, then there will be interoperability problems despite that server's "conformance" to spec.
-Therefore, making a an associative array mandatory simplifies the specification and guarantees interoperabilty.
+    The rationale for requiring an associative array is to maximize portability
+    between servers. In practice, however, most servers will probably find a
+    Request class adequate to their needs, and thus framework authors will come
+    to expect the full set of features to be available, since they will be
+    there more often than not.  But, if some server chooses not to use an
+    associative array, then there will be interoperability problems despite
+    that server's "conformance" to spec.  Therefore, making a an associative
+    array mandatory simplifies the specification and guarantees
+    interoperabilty.
+
 2. Why is this interface so low-level? I want feature X! (e.g. cookies, sessions, persistence, ...)
 
-	This isn't Yet Another PHP Web Framework. It's just a way for frameworks to talk to web servers, and vice versa. If you want these features, you need to pick a web framework that provides the features you want. And if that framework lets you create a PHPSGI application, you should be able to run it in most PHPSGI-supporting servers. 
-	Also, some PHPSGI servers may offer additional services via objects provided in their environ dictionary; see the applicable server documentation for details. (Of course, applications that use such extensions will not be portable to other PHPSGI-based servers.)
+    This isn't Yet Another PHP Web Framework. It's just a way for frameworks to
+    talk to web servers, and vice versa. If you want these features, you need
+    to pick a web framework that provides the features you want. And if that
+    framework lets you create a PHPSGI application, you should be able to run
+    it in most PHPSGI-supporting servers.  Also, some PHPSGI servers may offer
+    additional services via objects provided in their environ dictionary; see
+    the applicable server documentation for details. (Of course, applications
+    that use such extensions will not be portable to other PHPSGI-based
+    servers.)
+
 3. Why use CGI variables instead of good old HTTP headers? And why mix them in with PHPSGI-defined variables?
 
-	Many existing web frameworks are built heavily upon the CGI spec, especially the global `$_SERVER` variable, and existing SAPI web servers know how to generate CGI variables. In contrast, alternative ways of representing inbound HTTP information are fragmented and lack market share.
-	Thus, using the CGI "standard" seems like a good way to leverage existing implementations. As for mixing them with PHPSGI variables, separating them would just require two assoc array  arguments to be passed around, while providing no real benefits.
+    Many existing web frameworks are built heavily upon the CGI spec,
+    especially the global `$_SERVER` variable, and existing SAPI web servers
+    know how to generate CGI variables. In contrast, alternative ways of
+    representing inbound HTTP information are fragmented and lack market share.
+    Thus, using the CGI "standard" seems like a good way to leverage existing
+    implementations. As for mixing them with PHPSGI variables, separating them
+    would just require two assoc array  arguments to be passed around, while
+    providing no real benefits.
 
 ## Changelogs
 
