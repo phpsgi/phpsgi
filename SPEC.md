@@ -207,17 +207,44 @@ that do not support the relevant extensions.
 
 ### The Input Stream
 
-The input stream in phpsgi.input is an resource which streams the
-raw HTTP POST or PUT data. If it is a file handle then it MUST be opened in
-binary mode. The input stream MUST respond to read and MAY implement seek.
+The input stream in phpsgi.input is an resource object which streams the
+raw HTTP POST or PUT data. The file handle MUST be opened in
+binary mode.
+
+The input stream object MUST respond to read and MAY implement seek. Here is an
+example that implements a stream Buffer object for `php://input`:
+
+```php
+class StreamBuffer
+{
+    protected $fd;
+
+    public function __construct($fd)
+    {
+        $this->fd = $fd;
+    }
+
+    public function read(int $max_bytes)
+    {
+        return fread($fd, $max_bytes);
+    }
+}
+```
+
+The minimal requirement is compatible with the implementation of event
+extension's `EventBuffer` <http://php.net/manual/en/eventbuffer.read.php>.
 
 
-PHP's built-in file handle or `StreamWrapper` based objects
-<http://php.net/manual/en/wrappers.php.php> should work as-is in a PHPSGI
-server. Application developers SHOULD NOT inspect the type or class of the
-stream. Instead, they SHOULD simply call fread on the object.
+And please note that `php://input` doesn't support `seek`. see
+<http://php.net/manual/en/wrappers.php.php#wrappers.php.input> for more
+details.
 
-
+> Note: Prior to PHP 5.6, a stream opened with `php://input` could only be read
+> once; the stream did not support seek operations. However, depending on the
+> SAPI implementation, it may be possible to open another php://input stream
+> and restart reading. This is only possible if the request body data has been
+> saved. Typically, this is the case for POST requests, but not other request
+> methods, such as PUT or PROPFIND.
 
 ### Middleware
 
