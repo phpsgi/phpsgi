@@ -211,7 +211,7 @@ The input stream in phpsgi.input is an resource object which streams the
 raw HTTP POST or PUT data. The file handle MUST be opened in
 binary mode.
 
-The input stream object MUST respond to read and MAY implement seek. Here is an
+The input stream object MUST respond to `read` and MAY implement `seek`. Here is an
 example that implements a stream Buffer object for `php://input`:
 
 ```php
