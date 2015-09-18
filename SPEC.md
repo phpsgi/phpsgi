@@ -242,7 +242,7 @@ class SAPIInputBuffer implements ReadableBuffer
 
 If your Buffer supports `seek`, you can implements your buffer class with interface `PHPSGI\Buffer\SeekableBuffer`.
 
-The minimal requirement is compatible with the implementation of event
+The minimal requirement also conforms to the implementation of event
 extension's `EventBuffer` <http://php.net/manual/en/eventbuffer.read.php>.
 
 
