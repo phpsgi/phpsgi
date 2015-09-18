@@ -215,7 +215,9 @@ The input stream object MUST respond to `read` and MAY implement `seek`. Here is
 example that implements a stream Buffer object for `php://input`:
 
 ```php
-class SAPIInputBuffer
+use PHPSGI\Buffer\ReadableBuffer;
+
+class SAPIInputBuffer implements ReadableBuffer
 {
     protected $fd;
 
@@ -229,13 +231,14 @@ class SAPIInputBuffer
         return fread($this->fd, $bytes);
     }
 
-
     public function __destruct()
     {
         fclose($this->fd);
     }
 }
 ```
+
+If your Buffer supports `seek`, you can implements your buffer class with interface `PHPSGI\Buffer\SeekableBuffer`.
 
 The minimal requirement is compatible with the implementation of event
 extension's `EventBuffer` <http://php.net/manual/en/eventbuffer.read.php>.
