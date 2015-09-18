@@ -215,18 +215,24 @@ The input stream object MUST respond to `read` and MAY implement `seek`. Here is
 example that implements a stream Buffer object for `php://input`:
 
 ```php
-class StreamBuffer
+class SAPIInputBuffer
 {
     protected $fd;
 
-    public function __construct($fd)
+    public function __construct()
     {
-        $this->fd = $fd;
+        $this->fd = fopen('php://input', 'r');
     }
 
-    public function read(int $max_bytes)
+    public function read($bytes)
     {
-        return fread($fd, $max_bytes);
+        return fread($this->fd, $bytes);
+    }
+
+
+    public function __destruct()
+    {
+        fclose($this->fd);
     }
 }
 ```
