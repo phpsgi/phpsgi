@@ -126,11 +126,13 @@ The environment array is derived from `$_SERVER` since it's supported by all cur
 To create an environment array from PHP's super global arrays (for SAPI servers):
 
 ```php
+use Funk\Buffer\SAPIInputBuffer;
+
 $environment = array_merge($_SERVER, [
 	'parameters' => $_REQUEST,
 	'body_parameters' => $_POST,
 	'query_parameters' => $_GET,
-    'phpsgi.input' => fopen('php://input'),
+    'phpsgi.input' => new SAPIInputBuffer();
 ]);
 ```
 
