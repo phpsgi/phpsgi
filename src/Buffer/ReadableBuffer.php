@@ -1,5 +1,5 @@
 <?php
-namespace Buffer;
+namespace PHPSGI\Buffer;
 
 interface ReadableBuffer
 {
