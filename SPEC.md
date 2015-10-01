@@ -11,11 +11,26 @@ Please keep in mind that PHPSGI is not Yet Another web application framework.  P
 
 ## Implementation
 
+Currently there is a HTTP Server Toolkit implementation of PHPSGI that supports SAPI backends (Apache mod_php and php-fpm) called *Funk* (<https://github.com/phpsgi/Funk>) you can check the source code for more details.
+
 To develop PHPSGI compatible applications, you can use composer to install `phpsgi/phpsgi` package.
 
 ```sh
 composer require phpsgi/phpsgi "dev-master"
 ```
+
+## Status of This Specification
+
+- [x] Environment Variable Format
+- [x] Response Format
+- [x] Middleware Design (Request for comments)
+- [x] Application Design (Request for comments)
+- [x] Input Stream
+- [ ] Output Stream
+- [ ] Delayed Response
+- [ ] File Upload Support
+- [ ] Session and Cookie Support (`$_SESSION`. `$_COOKIES`).
+
 
 ## Terminology
 
