@@ -20,5 +20,6 @@
     "require-dev": { },
     "autoload": {
         "psr-4": { "PHPSGI\\": "src/" }
-    }
+    },
+    "extra": { "branch-alias": { "dev-master": "1.0.x-dev" } }
 }
